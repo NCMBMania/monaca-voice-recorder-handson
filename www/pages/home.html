@@ -24,12 +24,6 @@
             `)}
           </ul>
         </div>
-        <!-- 録音データが選択されたら audio タグを表示する -->
-        ${ uri !== '' ?
-          $h`<audio src="${uri}" controls style="width:100%;"></audio>`
-          :
-        ''
-        }
       </p>
     </div>
   </div>
@@ -111,10 +105,20 @@
     const listen = async (file) => {
       // ファイルストアからダウンロード
       const blob = await ncmb.File.download(file.fileName, 'blob');
-      // URIに変換
-      uri = URL.createObjectURL(blob);
-      // 描画更新
-      $update();
+      // BlobからArrayBufferに変換
+      const arrayBuffer = await blob.arrayBuffer();
+      // Web Audio APIのコンテキストを作成
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      const context = new AudioContext();
+      // ArrayBufferからAudioBufferに変換
+      const audioBuffer = await (new Promise((res, rej) => {
+        context.decodeAudioData(arrayBuffer, res, rej);
+      }));
+      // ソースを使って再生
+      const source = context.createBufferSource();
+      source.buffer = audioBuffer;
+      source.connect(context.destination);
+      source.start(0);
     }
     return $render;
   }
