@@ -39,12 +39,6 @@
     let files = [];
     // 画面が表示された際の処理
     $onMounted(async () => {
-      // NCMBのファイルストアから録音データをダウンロード
-      files = await ncmb.File
-        .regularExpressionTo('fileName', 'record_.*') // recordからはじまるファイルを対象に検索
-        .fetchAll();
-      // 描画更新
-      $update();
     });
 
     // 録音開始ボタンを押した時の処理
@@ -86,21 +80,11 @@
 
     // 停止処理
     const _stop = async (e) => {
-      // 録音データをBlobに変換
-      const audioBlob = new Blob(audioData);
-      // ファイル名生成（タイムスタンプを利用）
-      const d = new Date();
-      const fileName = `record_${d.getTime()}.${audioExtension}`;
-      // NCMBへアップロード
-      const file = await ncmb.File.upload(fileName, audioBlob);
-      // 一覧に追加
-      files.push(file);
-      // 描画更新
-      $update();
     }
 
     // 録音データを選択した際の処理
     const listen = async (file) => {
+      /*
       // ファイルストアからダウンロード
       const blob = await ncmb.File.download(file.fileName, 'blob');
       // BlobからArrayBufferに変換
@@ -117,6 +101,7 @@
       source.buffer = audioBuffer;
       source.connect(context.destination);
       source.start(0);
+      */
     }
     return $render;
   }
